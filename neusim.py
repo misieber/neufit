@@ -41,7 +41,7 @@ def non_negative_int(arg):
     return nnint
     
 def float_0_1(arg):
-    # Argparser type: float in the open interval (0,1)
+    # Argparser type: float in the interval [0,1]
     f01 = float(arg)
     if f01 < 0 or f01 > 1:
         raise ArgumentTypeError(arg + ', m must be between 0 and 1')
