@@ -83,7 +83,7 @@ if args.rarefaction_level == 0 or args.rarefaction_level > max(abundances.sum(0)
     args.rarefaction_level = min(abundances.sum(0))
     print('rarefying to highest possible uniform read depth',)
 else:
-    print ('rarefying to custom rarefaction level',)
+    print('rarefying to custom rarefaction level',)
 print('(' + str(args.rarefaction_level) + ' reads per sample)')
 
 # Optionally subsample the abundance table, unless all samples already have the required uniform read depth
@@ -107,7 +107,7 @@ occurr_freqs['occurrence'] = occurrence_frequency
 occurr_freqs = occurr_freqs.sort_values(by=['mean_abundance'])
 
 # Join with taxonomic information (optional)
-if args.taxonomy_file != None:
+if args.taxonomy_file is not None:
     taxonomy = pd.read_table(args.taxonomy_file, header=0, index_col=0, sep='\t')
     taxonomy.index.name = 'otu_id'
     occurr_freqs = occurr_freqs.join(taxonomy)
