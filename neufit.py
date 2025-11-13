@@ -51,7 +51,7 @@ def subsample(counts, depth):
             subsample = np.random.choice(flattened, depth, replace=False)
             counts[sample] = np.bincount(subsample, minlength=counts[sample].size)
         else:
-            print 'dropping sample ' + sample + ' with ' + str(counts[sample].sum()) + ' reads < ' + str(depth)
+            print('dropping sample ' + sample + ' with ' + str(counts[sample].sum()) + ' reads < ' + str(depth))
             counts = counts.drop(sample, axis=1)
     return counts
 
@@ -72,19 +72,19 @@ parser.add_argument('-i', dest='ignore_level', type=non_negative_int, default=0,
 args = parser.parse_args()
 
 # Read data
-print 'reading ' + args.data_file.name
+print('reading ' + args.data_file.name)
 abundances = pd.read_table(args.data_file, header=0, index_col=0, sep='\t').astype(int)
 abundances = abundances[abundances.sum(1) > args.ignore_level]
-print 'dataset contains ' + str(abundances.shape[1]) + ' samples (sample_id, reads):'
-print abundances.sum(0)
+print('dataset contains ' + str(abundances.shape[1]) + ' samples (sample_id, reads):')
+print(abundances.sum(0))
 
 # Determine uniform read depth
 if args.rarefaction_level == 0 or args.rarefaction_level > max(abundances.sum(0)):
     args.rarefaction_level = min(abundances.sum(0))
-    print 'rarefying to highest possible uniform read depth',
+    print('rarefying to highest possible uniform read depth',)
 else:
-    print 'rarefying to custom rarefaction level',
-print '(' + str(args.rarefaction_level) + ' reads per sample)'
+    print ('rarefying to custom rarefaction level',)
+print('(' + str(args.rarefaction_level) + ' reads per sample)')
 
 # Optionally subsample the abundance table, unless all samples already have the required uniform read depth
 if not all(n_reads == args.rarefaction_level for n_reads in abundances.sum(0)):
@@ -95,7 +95,7 @@ if not all(n_reads == args.rarefaction_level for n_reads in abundances.sum(0)):
 n_otus, n_samples = abundances.shape
 n_reads = args.rarefaction_level
 
-print 'fitting neutral expectation to dataset with ' + str(n_samples) + ' samples and ' + str(n_otus) + ' otus'
+print('fitting neutral expectation to dataset with ' + str(n_samples) + ' samples and ' + str(n_otus) + ' otus')
 
 # Calculate mean relative abundances and occurrence frequencies
 mean_relative_abundance = (1.0*abundances.sum(1))/n_reads/n_samples
@@ -107,7 +107,7 @@ occurr_freqs['occurrence'] = occurrence_frequency
 occurr_freqs = occurr_freqs.sort_values(by=['mean_abundance'])
 
 # Join with taxonomic information (optional)
-if args.taxonomy_file <> None:
+if args.taxonomy_file != None:
     taxonomy = pd.read_table(args.taxonomy_file, header=0, index_col=0, sep='\t')
     taxonomy.index.name = 'otu_id'
     occurr_freqs = occurr_freqs.join(taxonomy)
@@ -122,7 +122,7 @@ beta_fit = beta_model.fit(occurr_freqs['occurrence'], params, p=occurr_freqs['me
 # Report fit statistics
 r_square = 1.0 - np.sum(np.square(occurr_freqs['occurrence'] - beta_fit.best_fit))/np.sum(np.square(occurr_freqs['occurrence'] - np.mean(occurr_freqs['occurrence'])))
 print(fit_report(beta_fit))
-print 'R^2 = ' + '{:1.2f}'.format(r_square)
+print('R^2 = ' + '{:1.2f}'.format(r_square))
 
 # Adding the neutral prediction to results
 occurr_freqs['predicted_occurrence'] = beta_fit.best_fit
